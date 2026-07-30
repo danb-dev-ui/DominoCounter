@@ -1,1 +1,0 @@
-console.log("Domino Counter Version 0.1");

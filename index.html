@@ -2,26 +2,52 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Domino Counter</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-    <div class="container">
+    <main class="app">
+
+        <div class="logo">
+            <img src="icons/domino-logo.svg"
+                 alt="Domino Counter">
+        </div>
 
         <h1>Domino Counter</h1>
 
-        <h2>Version 0.1</h2>
+        <p class="subtitle">
+            Scan a player's remaining dominoes.
+        </p>
 
-        <p>Ready to Build!</p>
+        <button id="scanButton">
+            Scan Dominoes
+        </button>
 
-    </div>
+        <button id="captureButton" style="display:none;">
+            Capture
+        </button>
 
-    <script src="app.js"></script>
+        <canvas id="snapshot" style="display:none;"></canvas>
+
+        <p id="status"></p>
+
+        <footer>
+            Version 0.4.0
+        </footer>
+
+    </main>
+
+    <script type="module" src="js/app.js"></script>
 
 </body>
 
