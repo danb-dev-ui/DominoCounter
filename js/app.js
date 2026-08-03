@@ -34,6 +34,7 @@ scanButton.onclick = async () => {
         video = document.createElement("video");
 
         video.id = "camera";
+
         video.autoplay = true;
         video.playsInline = true;
 
@@ -74,6 +75,9 @@ captureButton.onclick = () => {
 
     captureButton.textContent = "Scan Another Hand";
 
-    setStatus("Image captured.");
+    // NEW
+    setStatus(
+        `Image captured (${canvas.width} × ${canvas.height})`
+    );
 
 };
