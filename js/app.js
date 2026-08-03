@@ -14,6 +14,19 @@ const canvas = document.getElementById("snapshot");
 
 let video = null;
 
+function resetApplication() {
+
+    canvas.style.display = "none";
+
+    captureButton.style.display = "none";
+    captureButton.textContent = "Capture";
+
+    scanButton.style.display = "block";
+
+    setStatus("");
+
+}
+
 scanButton.onclick = async () => {
 
     if (!video) {
@@ -21,11 +34,11 @@ scanButton.onclick = async () => {
         video = document.createElement("video");
 
         video.id = "camera";
-
         video.autoplay = true;
         video.playsInline = true;
 
-        document.querySelector(".app")
+        document
+            .querySelector(".app")
             .insertBefore(video, captureButton);
 
     }
@@ -36,7 +49,6 @@ scanButton.onclick = async () => {
     await openCamera(video);
 
     captureButton.style.display = "block";
-
     scanButton.style.display = "none";
 
     setStatus("Tap Capture when ready.");
@@ -45,21 +57,22 @@ scanButton.onclick = async () => {
 
 captureButton.onclick = () => {
 
+    if (captureButton.textContent === "Scan Another Hand") {
+
+        resetApplication();
+
+        return;
+
+    }
+
     captureFrame(video, canvas);
 
     stopCamera();
 
     video.style.display = "none";
-
     canvas.style.display = "block";
 
     captureButton.textContent = "Scan Another Hand";
-
-    captureButton.onclick = () => {
-
-        location.reload();
-
-    };
 
     setStatus("Image captured.");
 
