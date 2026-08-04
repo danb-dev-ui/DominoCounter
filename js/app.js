@@ -8,6 +8,10 @@ import {
     setStatus
 } from "./ui.js";
 
+import {
+    analyzeImage
+} from "./vision.js";
+
 const scanButton = document.getElementById("scanButton");
 const captureButton = document.getElementById("captureButton");
 const canvas = document.getElementById("snapshot");
@@ -34,12 +38,10 @@ scanButton.onclick = async () => {
         video = document.createElement("video");
 
         video.id = "camera";
-
         video.autoplay = true;
         video.playsInline = true;
 
-        document
-            .querySelector(".app")
+        document.querySelector(".app")
             .insertBefore(video, captureButton);
 
     }
@@ -71,13 +73,15 @@ captureButton.onclick = () => {
     stopCamera();
 
     video.style.display = "none";
+
     canvas.style.display = "block";
+
+    const brightPixels = analyzeImage(canvas);
 
     captureButton.textContent = "Scan Another Hand";
 
-    // NEW
     setStatus(
-        `Image captured (${canvas.width} × ${canvas.height})`
+        `Bright pixels: ${brightPixels.toLocaleString()}`
     );
 
 };
