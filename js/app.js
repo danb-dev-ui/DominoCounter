@@ -76,12 +76,12 @@ captureButton.onclick = () => {
 
     canvas.style.display = "block";
 
-    const brightPixels = analyzeImage(canvas);
+    const result = analyzeImage(canvas);
 
-    captureButton.textContent = "Scan Another Hand";
+captureButton.textContent = "Scan Another Hand";
 
-    setStatus(
-        `Bright pixels: ${brightPixels.toLocaleString()}`
-    );
+setStatus(
+    `Bright Pixels: ${result.brightPixels.toLocaleString()}`
+);
 
 };
