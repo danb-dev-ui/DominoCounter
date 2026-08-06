@@ -1,40 +1,87 @@
+//
+// Domino Counter
+// Version 0.5.6
+// Adjustable Threshold
+//
+
+const THRESHOLD = 200;
+
 export function analyzeImage(canvas) {
 
     const ctx = canvas.getContext("2d");
 
+    const width = canvas.width;
+    const height = canvas.height;
+
     const image = ctx.getImageData(
         0,
         0,
-        canvas.width,
-        canvas.height
+        width,
+        height
     );
 
     const pixels = image.data;
 
+    const binary = new Uint8Array(width * height);
+
     let brightPixels = 0;
 
-    for (let i = 0; i < pixels.length; i += 4) {
+    for (let y = 0; y < height; y++) {
 
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
+        for (let x = 0; x < width; x++) {
 
-        const brightness = (r + g + b) / 3;
+            const index = y * width + x;
 
-        if (brightness > 200) {
+            const p = index * 4;
 
-            brightPixels++;
+            const r = pixels[p];
+            const g = pixels[p + 1];
+            const b = pixels[p + 2];
 
-            pixels[i] = 255;
-            pixels[i + 1] = 0;
-            pixels[i + 2] = 0;
+            const brightness = (r + g + b) / 3;
+
+            if (brightness >= THRESHOLD) {
+
+                binary[index] = 1;
+
+                brightPixels++;
+
+            }
 
         }
 
     }
 
-    ctx.putImageData(image, 0, 0);
+    //
+    // Draw sampled pixels
+    //
 
-    return brightPixels;
+    ctx.fillStyle = "red";
+
+    for (let y = 0; y < height; y += 4) {
+
+        for (let x = 0; x < width; x += 4) {
+
+            const index = y * width + x;
+
+            if (binary[index]) {
+
+                ctx.fillRect(x, y, 2, 2);
+
+            }
+
+        }
+
+    }
+
+    return {
+
+        width,
+        height,
+        brightPixels,
+        threshold: THRESHOLD,
+        binary
+
+    };
 
 }

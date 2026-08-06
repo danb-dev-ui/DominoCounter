@@ -1,3 +1,8 @@
+//
+// Domino Counter
+// Version 0.5.6
+//
+
 import {
     openCamera,
     stopCamera,
@@ -52,6 +57,7 @@ scanButton.onclick = async () => {
     await openCamera(video);
 
     captureButton.style.display = "block";
+
     scanButton.style.display = "none";
 
     setStatus("Tap Capture when ready.");
@@ -78,10 +84,10 @@ captureButton.onclick = () => {
 
     const result = analyzeImage(canvas);
 
-captureButton.textContent = "Scan Another Hand";
+    captureButton.textContent = "Scan Another Hand";
 
-setStatus(
-    `Bright Pixels: ${result.brightPixels.toLocaleString()}`
-);
+    setStatus(
+        `Threshold ${result.threshold}   Bright Pixels ${result.brightPixels.toLocaleString()}`
+    );
 
 };
