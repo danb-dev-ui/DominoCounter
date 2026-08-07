@@ -1,6 +1,6 @@
 //
 // Domino Counter
-// Version 0.5.6
+// Version 0.5.7
 //
 
 import {
@@ -23,19 +23,6 @@ const canvas = document.getElementById("snapshot");
 
 let video = null;
 
-function resetApplication() {
-
-    canvas.style.display = "none";
-
-    captureButton.style.display = "none";
-    captureButton.textContent = "Capture";
-
-    scanButton.style.display = "block";
-
-    setStatus("");
-
-}
-
 scanButton.onclick = async () => {
 
     if (!video) {
@@ -43,6 +30,7 @@ scanButton.onclick = async () => {
         video = document.createElement("video");
 
         video.id = "camera";
+
         video.autoplay = true;
         video.playsInline = true;
 
@@ -66,28 +54,25 @@ scanButton.onclick = async () => {
 
 captureButton.onclick = () => {
 
-    if (captureButton.textContent === "Scan Another Hand") {
-
-        resetApplication();
-
-        return;
-
-    }
-
     captureFrame(video, canvas);
 
     stopCamera();
 
     video.style.display = "none";
-
     canvas.style.display = "block";
 
     const result = analyzeImage(canvas);
 
     captureButton.textContent = "Scan Another Hand";
 
+    captureButton.onclick = () => {
+
+        location.reload();
+
+    };
+
     setStatus(
-        `Threshold ${result.threshold}   Bright Pixels ${result.brightPixels.toLocaleString()}`
+        `Candidate domino pixels: ${result.whitePixels.toLocaleString()}`
     );
 
 };

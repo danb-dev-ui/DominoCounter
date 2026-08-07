@@ -1,10 +1,11 @@
 //
 // Domino Counter
-// Version 0.5.6
-// Adjustable Threshold
+// Version 0.5.7
+// White Object Detection
 //
 
-const THRESHOLD = 200;
+const MIN_BRIGHTNESS = 170;
+const MAX_COLOR_DIFF = 35;
 
 export function analyzeImage(canvas) {
 
@@ -13,26 +14,19 @@ export function analyzeImage(canvas) {
     const width = canvas.width;
     const height = canvas.height;
 
-    const image = ctx.getImageData(
-        0,
-        0,
-        width,
-        height
-    );
+    const image = ctx.getImageData(0, 0, width, height);
 
     const pixels = image.data;
 
-    const binary = new Uint8Array(width * height);
+    let whitePixels = 0;
 
-    let brightPixels = 0;
+    ctx.fillStyle = "red";
 
-    for (let y = 0; y < height; y++) {
+    for (let y = 0; y < height; y += 2) {
 
-        for (let x = 0; x < width; x++) {
+        for (let x = 0; x < width; x += 2) {
 
-            const index = y * width + x;
-
-            const p = index * 4;
+            const p = (y * width + x) * 4;
 
             const r = pixels[p];
             const g = pixels[p + 1];
@@ -40,33 +34,18 @@ export function analyzeImage(canvas) {
 
             const brightness = (r + g + b) / 3;
 
-            if (brightness >= THRESHOLD) {
+            const colorSpread =
+                Math.max(r, g, b) -
+                Math.min(r, g, b);
 
-                binary[index] = 1;
-
-                brightPixels++;
-
-            }
-
-        }
-
-    }
-
-    //
-    // Draw sampled pixels
-    //
-
-    ctx.fillStyle = "red";
-
-    for (let y = 0; y < height; y += 4) {
-
-        for (let x = 0; x < width; x += 4) {
-
-            const index = y * width + x;
-
-            if (binary[index]) {
+            if (
+                brightness > MIN_BRIGHTNESS &&
+                colorSpread < MAX_COLOR_DIFF
+            ) {
 
                 ctx.fillRect(x, y, 2, 2);
+
+                whitePixels++;
 
             }
 
@@ -76,11 +55,7 @@ export function analyzeImage(canvas) {
 
     return {
 
-        width,
-        height,
-        brightPixels,
-        threshold: THRESHOLD,
-        binary
+        whitePixels
 
     };
 
