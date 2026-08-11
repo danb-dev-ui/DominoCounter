@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Domino Counter - Image Test</title>
+
+    <style>
+
+        body {
+
+            margin: 0;
+
+            padding: 20px;
+
+            background: #202124;
+
+            color: white;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            text-align: center;
+
+        }
+
+        .container {
+
+            max-width: 700px;
+
+            margin: auto;
+
+        }
+
+        input {
+
+            margin: 20px;
+
+            padding: 10px;
+
+            font-size: 18px;
+
+        }
+
+        canvas {
+
+            max-width: 100%;
+
+            margin-top: 20px;
+
+            border-radius: 12px;
+
+        }
+
+        #score {
+
+            font-size: 64px;
+
+            font-weight: bold;
+
+            margin: 20px;
+
+        }
+
+        #status {
+
+            font-size: 20px;
+
+            color: #88ff88;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Domino Counter</h1>
+
+        <h2>Version 0.6.0 Image Test</h2>
+
+        <p>
+            Select one of the domino photos.
+        </p>
+
+        <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+        >
+
+        <div id="score"></div>
+
+        <p id="status">
+            Select an image to begin.
+        </p>
+
+        <canvas id="canvas"></canvas>
+
+    </div>
+
+    <script type="module">
+
+        import {
+            analyzeImage
+        } from "./js/vision.js";
+
+        const imageInput =
+            document.getElementById("imageInput");
+
+        const canvas =
+            document.getElementById("canvas");
+
+        const score =
+            document.getElementById("score");
+
+        const status =
+            document.getElementById("status");
+
+        imageInput.addEventListener(
+            "change",
+            () => {
+
+                const file =
+                    imageInput.files[0];
+
+                if (!file) {
+                    return;
+                }
+
+                const image =
+                    new Image();
+
+                image.onload = () => {
+
+                    canvas.width =
+                        image.naturalWidth;
+
+                    canvas.height =
+                        image.naturalHeight;
+
+                    const ctx =
+                        canvas.getContext("2d");
+
+                    ctx.drawImage(
+                        image,
+                        0,
+                        0
+                    );
+
+                    try {
+
+                        const result =
+                            analyzeImage(canvas);
+
+                        score.textContent =
+                            result.score;
+
+                        status.textContent =
+                            `Detected ${result.pipCount} pips.`;
+
+                    } catch (error) {
+
+                        console.error(error);
+
+                        score.textContent = "";
+
+                        status.textContent =
+                            "Error analyzing image.";
+
+                    }
+
+                    URL.revokeObjectURL(
+                        image.src
+                    );
+
+                };
+
+                image.src =
+                    URL.createObjectURL(file);
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

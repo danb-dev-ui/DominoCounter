@@ -1,8 +1,3 @@
-//
-// Domino Counter
-// Version 0.5.7
-//
-
 import {
     openCamera,
     stopCamera,
@@ -10,69 +5,208 @@ import {
 } from "./camera.js";
 
 import {
-    setStatus
-} from "./ui.js";
-
-import {
     analyzeImage
 } from "./vision.js";
 
-const scanButton = document.getElementById("scanButton");
-const captureButton = document.getElementById("captureButton");
-const canvas = document.getElementById("snapshot");
+import {
+    setStatus,
+    showScore
+} from "./ui.js";
+
+
+const scanButton =
+    document.getElementById("scanButton");
+
+const captureButton =
+    document.getElementById("captureButton");
+
+const canvas =
+    document.getElementById("snapshot");
+
 
 let video = null;
 
+let cameraStream = null;
+
+
+/*
+ * Start camera.
+ */
 scanButton.onclick = async () => {
 
-    if (!video) {
+    try {
 
-        video = document.createElement("video");
+        if (!video) {
 
-        video.id = "camera";
+            video =
+                document.createElement(
+                    "video"
+                );
 
-        video.autoplay = true;
-        video.playsInline = true;
+            video.id =
+                "camera";
 
-        document.querySelector(".app")
-            .insertBefore(video, captureButton);
+            video.autoplay =
+                true;
+
+            video.playsInline =
+                true;
+
+
+            document
+                .querySelector(".app")
+                .insertBefore(
+                    video,
+                    captureButton
+                );
+
+        }
+
+
+        canvas.style.display =
+            "none";
+
+        video.style.display =
+            "block";
+
+
+        setStatus(
+            "Starting camera..."
+        );
+
+
+        cameraStream =
+            await openCamera(
+                video
+            );
+
+
+        captureButton.style.display =
+            "block";
+
+        scanButton.style.display =
+            "none";
+
+
+        setStatus(
+            "Point the camera at the dominoes, then tap Capture."
+        );
 
     }
 
-    canvas.style.display = "none";
-    video.style.display = "block";
+    catch (error) {
 
-    await openCamera(video);
+        console.error(
+            "Camera error:",
+            error
+        );
 
-    captureButton.style.display = "block";
 
-    scanButton.style.display = "none";
+        setStatus(
+            "Unable to start the camera."
+        );
 
-    setStatus("Tap Capture when ready.");
+    }
 
 };
 
+
+/*
+ * Capture and analyze.
+ */
 captureButton.onclick = () => {
 
-    captureFrame(video, canvas);
+    if (!video) {
 
-    stopCamera();
+        return;
 
-    video.style.display = "none";
-    canvas.style.display = "block";
+    }
 
-    const result = analyzeImage(canvas);
 
-    captureButton.textContent = "Scan Another Hand";
+    /*
+     * Capture current camera frame.
+     */
+    captureFrame(
+        video,
+        canvas
+    );
 
-    captureButton.onclick = () => {
 
-        location.reload();
+    /*
+     * Stop camera.
+     */
+    stopCamera(
+        cameraStream
+    );
 
-    };
+
+    cameraStream =
+        null;
+
+
+    video.style.display =
+        "none";
+
+    canvas.style.display =
+        "block";
+
 
     setStatus(
-        `Candidate domino pixels: ${result.whitePixels.toLocaleString()}`
+        "Analyzing dominoes..."
     );
+
+
+    /*
+     * Run the same detector used
+     * by test.html.
+     */
+    try {
+
+        const result =
+            analyzeImage(
+                canvas
+            );
+
+
+        showScore(
+            result.score,
+            result.pipCount
+        );
+
+
+        setStatus(
+            "Scan complete."
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Analysis error:",
+            error
+        );
+
+
+        setStatus(
+            "Unable to analyze the image."
+        );
+
+    }
+
+
+    /*
+     * Prepare for another scan.
+     */
+    captureButton.textContent =
+        "Scan Another Hand";
+
+
+    captureButton.onclick =
+        () => {
+
+            location.reload();
+
+        };
 
 };
